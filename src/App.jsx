@@ -7,10 +7,10 @@ export default function App() {
   const [songs, setSongs] = useState([]);
   const [search, setSearch] = useState("");
   const [currentVideoId, setCurrentVideoId] = useState(null);
+  const [currentSongName, setCurrentSongName] = useState(null);
   const [newName, setNewName] = useState("");
   const [newUrl, setNewUrl] = useState("");
 
-  // Cargar canciones desde localStorage o desde mi lista 
   useEffect(() => {
     const storedSongs = localStorage.getItem("songs");
 
@@ -21,32 +21,37 @@ export default function App() {
       setSongs(defaultSongs);
     }
   }, []);
-// Guardar canciones en localStorage 
+
   const extractVideoId = (url) => {
-    const regExp =
-      /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^\s&]+)/;
+    const regExp = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^\s&]+)/;
     const match = url.match(regExp);
     return match ? match[1] : null;
   };
-// Filtrar canciones según la búsqueda
+
   const filteredSongs = songs.filter((song) =>
     song.name.toLowerCase().includes(search.toLowerCase())
   );
-//reproducir la canción
+
   const handlePlay = (songName) => {
-    const updated = songs.map((song) => {
-      if (song.name === songName) {
-        return { ...song, plays: song.plays + 1 };
-      }
-      return song;
-    });
-
-    setSongs(updated);
-    localStorage.setItem("songs", JSON.stringify(updated));
-
-    const songClicked = updated.find((song) => song.name === songName);
-    const videoId = extractVideoId(songClicked.url);
+    const song = songs.find((s) => s.name === songName);
+    const videoId = extractVideoId(song.url);
     setCurrentVideoId(videoId);
+    setCurrentSongName(songName); // guardar cuál se está reproduciendo
+  };
+
+  const handleCloseVideo = () => {
+    if (currentSongName) {
+      const updated = songs.map((song) => {
+        if (song.name === currentSongName) {
+          return { ...song, plays: song.plays + 1 };
+        }
+        return song;
+      });
+      setSongs(updated);
+      localStorage.setItem("songs", JSON.stringify(updated));
+      setCurrentSongName(null);
+    }
+    setCurrentVideoId(null);
   };
 
   const handleAdd = () => {
@@ -95,11 +100,9 @@ export default function App() {
   const restSongs = [...songs].sort((a, b) => b.plays - a.plays).slice(3);
 
   return (
-  
     <div className="App">
       <div className="container">
         <div className="contenido-superior">
-          {/* Lado izquierdo: listado filtrado */}
           <div className="listado">
             <ul>
               {filteredSongs.map((song) => (
@@ -110,7 +113,6 @@ export default function App() {
             </ul>
           </div>
 
-          {/* Lado derecho: buscador, video y rankings */}
           <div className="cancionesContainer">
             <input
               type="text"
@@ -122,7 +124,7 @@ export default function App() {
 
             <VideoModal
               videoId={currentVideoId}
-              onClose={() => setCurrentVideoId(null)}
+              onClose={handleCloseVideo}
             />
 
             <div className="rankingContainer">
@@ -147,7 +149,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Sección inferior: agregar canción */}
         <div className="agregar">
           <input
             className="inputAgregar"
@@ -168,7 +169,6 @@ export default function App() {
           </button>
         </div>
       </div>
-      </div>
-    
+    </div>
   );
 }
