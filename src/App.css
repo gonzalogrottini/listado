@@ -4,39 +4,59 @@ body {
   background: url("fondo.jpg") no-repeat center center fixed;
   background-size: cover;
   color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
-/* Contenedor principal SIN borde RGB */
+/* ========== Contenedor principal ========== */
 .container {
-  box-sizing: border-box;
-  width: 1000px;
-  padding: 10px;
-  text-align: center;
-  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 15px;
   border-radius: 15px;
   background-color: rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-  margin: 30px auto;
-  z-index: 0;
+  border: 5px solid #35bfff;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Contenido superior: listado + canciones */
+/* ========== Contenido superior ========== */
 .contenido-superior {
   display: flex;
-  flex: 1 1 90%;
+  flex-direction: column;
+  width: 100%;
+  gap: 15px;
+  flex: 1;
+  height: 100%;
 }
 
+@media (min-width: 768px) {
+  .contenido-superior {
+    flex-direction: row;
+    height: 100%;
+  }
+}
+
+/* ========== Listado de canciones ========== */
 .listado {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   border: 5px solid #35bfff;
-  margin: 5px;
+  overflow: hidden;
+  min-width: 200px;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .listado ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  height: 100%;
+  flex-grow: 1;
   overflow-y: auto;
 }
 
@@ -48,29 +68,32 @@ body {
 }
 
 .listado li:hover {
-  background-color: rgba(0, 0, 0, 0.667);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* ========== Contenedor derecho ========== */
 .cancionesContainer {
   flex: 2;
-  border: 5px solid #35bfff;
-  margin: 5px;
   display: flex;
   flex-direction: column;
-  justify-content: start;
   align-items: center;
-  gap: 10px;
+  border: 5px solid #35bfff;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  overflow: hidden;
 }
 
 /* Buscador */
 .buscador {
-  color: rebeccapurple;
-  background: rgba(0, 0, 0, 0.615);
-  margin: 10px;
-  width: 95%;
-  text-align: center;
-  font-size: 30px;
+  width: 100%;
+  font-size: 20px;
   border-radius: 15px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.615);
+  color: rebeccapurple;
+  text-align: center;
+  border: none;
+  margin-bottom: 10px;
 }
 
 .buscador::placeholder {
@@ -78,25 +101,80 @@ body {
   padding-left: 5%;
 }
 
-/* Agregar canción */
+/* Botón de orden */
+.botonOrden {
+  background-color: #444;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+  margin-bottom: 15px;
+}
+
+.botonOrden:hover {
+  background-color: #666;
+}
+
+/* ========== Ranking ========== */
+.rankingContainer {
+  width: 100%;
+  flex-grow: 1;
+  border: 3px solid rebeccapurple;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.rankingTitulo {
+  color: rebeccapurple;
+  font-size: 20px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.rankingContainer ul {
+  margin: 0;
+  padding: 0 15px;
+  list-style: none;
+  font-size: 16px;
+  text-align: left;
+}
+
+.rankingContainer li {
+  margin: 4px 0;
+  word-wrap: break-word;
+}
+
+/* ========== Sección Agregar ========== */
 .agregar {
+  width: 100%;
+  max-width: 100%;
   border: 5px solid #35bfff;
   display: flex;
-  justify-content: start;
-  align-items: center;
-  padding: 5px;
-  gap: 5px;
-  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  overflow-x: auto;
 }
 
 .inputAgregar {
-  color: rebeccapurple;
-  background: rgba(0, 0, 0, 0.615);
-  width: 80%;
-  text-align: center;
-  font-size: 30px;
+  flex: 1 1 300px;
+  min-width: 200px;
+  font-size: 18px;
   border-radius: 15px;
-  padding: 5px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.615);
+  color: rebeccapurple;
+  text-align: center;
+  border: none;
 }
 
 .inputAgregar:focus {
@@ -105,17 +183,18 @@ body {
 }
 
 .buttonAgregar {
-  color: rebeccapurple;
-  background: rgba(0, 0, 0, 0.615);
-  width: 400px;
-  text-align: center;
-  font-size: 30px;
+  font-size: 18px;
+  padding: 10px 20px;
   border-radius: 15px;
-  padding: 5px;
+  border: none;
+  background: rgba(0, 0, 0, 0.615);
+  color: rebeccapurple;
   cursor: pointer;
+  flex-shrink: 0;
+  min-width: 150px;
 }
 
-/* Modal */
+/* ========== Modal ========== */
 .modal {
   position: fixed;
   top: 0;
@@ -135,15 +214,21 @@ body {
   border: 5px solid rebeccapurple;
   padding: 20px;
   border-radius: 15px;
-  width: 80%;
+  width: 90%;
   max-width: 700px;
 }
 
 .video-modal-iframe {
   width: 100%;
-  height: 400px;
+  height: 300px;
   border-radius: 10px;
   border: none;
+}
+
+@media (min-width: 600px) {
+  .video-modal-iframe {
+    height: 400px;
+  }
 }
 
 .video-modal-close {
@@ -155,32 +240,4 @@ body {
   font-size: 1.5rem;
   border: none;
   cursor: pointer;
-}
-
-/* Ranking */
-.rankingContainer {
-  width: 90%;
-  margin-top: 10px;
-  padding: 10px;
-  border: 3px solid rebeccapurple;
-  border-radius: 10px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-}
-
-.rankingTitulo {
-  color: rebeccapurple;
-  font-size: 20px;
-  margin: 10px 0 5px;
-}
-
-.rankingContainer ul {
-  margin: 0;
-  padding-left: 20px;
-  text-align: left;
-  font-size: 16px;
-}
-
-.rankingContainer li {
-  margin: 2px 0;
 }

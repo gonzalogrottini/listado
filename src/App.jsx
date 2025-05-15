@@ -10,10 +10,10 @@ export default function App() {
   const [currentSongName, setCurrentSongName] = useState(null);
   const [newName, setNewName] = useState("");
   const [newUrl, setNewUrl] = useState("");
+  const [ascendente, setAscendente] = useState(false);
 
   useEffect(() => {
     const storedSongs = localStorage.getItem("songs");
-
     if (storedSongs) {
       setSongs(JSON.parse(storedSongs));
     } else {
@@ -28,25 +28,20 @@ export default function App() {
     return match ? match[1] : null;
   };
 
-  const filteredSongs = songs.filter((song) =>
-    song.name.toLowerCase().includes(search.toLowerCase())
-  );
-
   const handlePlay = (songName) => {
     const song = songs.find((s) => s.name === songName);
     const videoId = extractVideoId(song.url);
     setCurrentVideoId(videoId);
-    setCurrentSongName(songName); // guardar cuál se está reproduciendo
+    setCurrentSongName(songName);
   };
 
   const handleCloseVideo = () => {
     if (currentSongName) {
-      const updated = songs.map((song) => {
-        if (song.name === currentSongName) {
-          return { ...song, plays: song.plays + 1 };
-        }
-        return song;
-      });
+      const updated = songs.map((song) =>
+        song.name === currentSongName
+          ? { ...song, plays: song.plays + 1 }
+          : song
+      );
       setSongs(updated);
       localStorage.setItem("songs", JSON.stringify(updated));
       setCurrentSongName(null);
@@ -63,9 +58,8 @@ export default function App() {
       return;
     }
 
-    const isValidYouTubeUrl = (url) => {
-      return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//.test(url);
-    };
+    const isValidYouTubeUrl = (url) =>
+      /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//.test(url);
 
     if (!isValidYouTubeUrl(trimmedUrl)) {
       alert("La URL debe ser un enlace válido de YouTube.");
@@ -77,6 +71,13 @@ export default function App() {
         song.name.toLowerCase() === trimmedName.toLowerCase() ||
         song.url === trimmedUrl
     );
+
+    // 🎯 Validación de que el nombre no sea una URL
+    const isValidName = !/^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(\/[^\s]*)?$/i.test(trimmedName);
+    if (!isValidName) {
+      alert("El nombre de la canción no puede ser una URL.");
+      return;
+    }
 
     if (isDuplicate) {
       alert("La canción ya está en la lista (por nombre o URL).");
@@ -96,8 +97,15 @@ export default function App() {
     setNewUrl("");
   };
 
-  const top3 = [...songs].sort((a, b) => b.plays - a.plays).slice(0, 3);
-  const restSongs = [...songs].sort((a, b) => b.plays - a.plays).slice(3);
+  // 🎯 Aplicar filtro SOLO a la lista izquierda
+  const filteredSongs = songs.filter((song) =>
+    song.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // 🎯 Ranking derecha: sin filtro, solo ordenado
+  const sortedSongs = [...songs].sort((a, b) =>
+    ascendente ? a.plays - b.plays : b.plays - a.plays
+  );
 
   return (
     <div className="App">
@@ -114,34 +122,28 @@ export default function App() {
           </div>
 
           <div className="cancionesContainer">
+            <VideoModal videoId={currentVideoId} onClose={handleCloseVideo} />
+
             <input
-              type="text"
+              type="search"
               className="buscador"
               placeholder="buscar canción 🔍"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-
-            <VideoModal
-              videoId={currentVideoId}
-              onClose={handleCloseVideo}
-            />
+            <button
+              className="botonOrden"
+              onClick={() => setAscendente(!ascendente)}
+            >
+              Ordenar {ascendente ? " Menor a mayor" : " Mayor a menor"}
+            </button>
 
             <div className="rankingContainer">
-              <h3 className="rankingTitulo">Top 3 canciones más reproducidas</h3>
+              <h3 className="rankingTitulo">Ranking de canciones</h3>
               <ul>
-                {top3.map((song, i) => (
+                {sortedSongs.map((song, i) => (
                   <li key={i}>
                     {i + 1}. {song.name} ({song.plays} reproducciones)
-                  </li>
-                ))}
-              </ul>
-
-              <h3 className="rankingTitulo">Ranking completo</h3>
-              <ul>
-                {restSongs.map((song, i) => (
-                  <li key={i}>
-                    {i + 4}. {song.name} ({song.plays} reproducciones)
                   </li>
                 ))}
               </ul>
@@ -152,14 +154,14 @@ export default function App() {
         <div className="agregar">
           <input
             className="inputAgregar"
-            type="text"
+            type="search"
             placeholder="Nombre de la canción"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
           />
           <input
             className="inputAgregar"
-            type="text"
+            type="search"
             placeholder="URL de la canción"
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
